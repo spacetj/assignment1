@@ -1,9 +1,9 @@
 package com.AdvancedProgramming.Users;
 
 /**
- * UserFactory utilizes the factory method to create the appropriate User given the age.
+ * Infact class is instantiated when the user is below 2 years old.
  *
- * @version 1.0.0 10th March 2018
+ * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
 public class Infant extends YoungAdult {
@@ -12,12 +12,16 @@ public class Infant extends YoungAdult {
         super(name, age, profilePicture, status, parent1, parent2);
     }
 
+    /**
+     * Overrides add relation function from user as only guardian can be friends with infants.
+     * @param newFriend
+     */
     @Override
     public void addRelation(Relationship newFriend) {
-        if(newFriend.getRelation() == RelationType.PARENT){
+        if(isGuardian.test(newFriend)){
             super.addRelation(newFriend);
+        } else {
+            System.out.println("Infants cannot have friends");
         }
-
-        System.out.println("Infants cannot have friends");
     }
 }

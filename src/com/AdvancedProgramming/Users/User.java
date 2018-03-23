@@ -1,6 +1,5 @@
 package com.AdvancedProgramming.Users;
 
-import javax.management.relation.Relation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,22 +7,21 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * MiniNet is the main class which controls the java social network.
+ * User is the abstract class which Adult, YoungAdult and Infants.
+ * Contains a list of generic methods and local variables that apply to all users.
  *
- * Run this class in order to start the command line application.
- *
- * @version 1.0.0 10th March 2018
+ * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
-public abstract class User implements UserActions{
+public abstract class User{
 
-    List<Relationship> relationships = new ArrayList<>();
+    protected List<Relationship> relationships = new ArrayList<>();
     private String name;
     private Integer age;
     private String profilePicture;
     private String status;
-    public static Predicate<User> isAgeLessThan2 = user -> user.getAge() <= 2;
     public static Predicate<Relationship> isDependant = relationship -> relationship.getRelation() == RelationType.DEPENDANT;
+    public static Predicate<Relationship> isGuardian = relationship -> relationship.getRelation() == RelationType.GUARDIAN;
 
     public User(String name, Integer age, String profilePicture, String status) {
         this.name = name;
@@ -32,47 +30,68 @@ public abstract class User implements UserActions{
         this.status = status;
     }
 
+    /**
+     * Gets the relation that may or may not exist with the given user.
+     * @param user User to search for.
+     * @return the optional relationship that may or may not exist.
+     */
     public Optional<Relationship> getUserRelation(User user){
         return relationships.stream().filter(o -> o.getUser() == user).findAny();
     }
 
-    @Override
+    /**
+     * Add a new relation to this user. Will have different specification according to relationtype.
+     * @param newFriend friend to add to user.
+     */
     public void addRelation(Relationship newFriend) {
 
-        if(!relationships.contains(newFriend) &&
-                (!isAgeLessThan2.test(newFriend.getUser()) || isDependant.test(newFriend))){
+        // If new user is guardian, the reciprocal relation should be dependant.
+        if (isDependant.test(newFriend) || isGuardian.test(newFriend)) {
+
+            relationships.add(newFriend);
+
+            if(isGuardian.test(newFriend)){
+                newFriend.getUser().addRelation(new Relationship(RelationType.DEPENDANT, this));
+            }
+
+        } else if (!relationships.contains(newFriend)) {
+
             Optional<Relationship> existingRelation = getUserRelation(newFriend.getUser());
 
-            // If user already has a relation with new friend, then update the exisiting relation status.
-            if(existingRelation.isPresent()){
+            if (existingRelation.isPresent()) {
                 existingRelation.get().setRelation(newFriend.getRelation());
-
-                //Update the new friends relation status to current user as well.
-                if(newFriend.getUser().getUserRelation(this).isPresent()){
-                    newFriend.getUser().getUserRelation(this).get().setRelation(newFriend.getRelation());
-                }
-
+                newFriend.getUser().getUserRelation(this).ifPresent(relationship1 ->
+                        relationship1.setRelation(newFriend.getRelation()));
             } else {
-                // Else create a new relation for other users.
                 relationships.add(newFriend);
                 newFriend.getUser().addRelation(new Relationship(newFriend.getRelation(), this));
             }
+
         }
     }
 
-    @Override
-    public void deleteRelation(Relationship friend) {
+    /**
+     * Deletes the relation for both users.
+     * @param friend to delete
+     */
+    public void deleteRelation(User friend) {
 
-        if(relationships.contains(friend)){
-            relationships.remove(friend);
+        Optional<Relationship> relation = relationships.stream()
+                .filter(o -> Objects.equals(o.getUser().getName(), friend.getName())).findAny();
+
+        if(relation.isPresent()){
+            relationships.remove(relation.get());
+            friend.deleteRelation(this);
         } else {
             System.out.println("No such relation exists.");
         }
     }
 
-    @Override
+    /**
+     * Displays information about the friends / relations of a user.
+     */
     public void showFriends() {
-        System.out.println("Total number of relationships: "+ relationships.size());
+        System.out.print("\n\nTotal number of relationships: "+ relationships.size()+"\n\n");
 
         relationships.forEach(relation -> {
             System.out.println("Relation Type: "+relation.getRelation());
@@ -87,35 +106,62 @@ public abstract class User implements UserActions{
                 System.out.println(relation.getUser().getStatus());
             }
 
-            System.out.println("============================");
             System.out.println();
         });
     }
 
+    /**
+     * Getter for friends
+     * @return
+     */
     public List<Relationship> getFriends() {
         return relationships;
     }
 
+    /**
+     * Getter for user's name
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Getter for user's age
+     * @return
+     */
     public Integer getAge() {
         return age;
     }
 
+    /**
+     * Getter for user's profile picture
+     * @return
+     */
     public String getProfilePicture() {
         return profilePicture;
     }
 
+    /**
+     * setter for users profile picture.
+     * @param profilePicture
+     */
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 
+    /**
+     * Getter for users status.
+     * @return
+     */
     public String getStatus() {
         return status;
     }
 
+    /**
+     * Setter for users status.
+     * @param status
+     */
     public void setStatus(String status) {
         this.status = status;
     }

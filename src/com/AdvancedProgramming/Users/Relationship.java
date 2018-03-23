@@ -1,9 +1,9 @@
 package com.AdvancedProgramming.Users;
 
 /**
- * UserFactory utilizes the factory method to create the appropriate User given the age.
+ * Relationship is the class used to add a friend to a user.
  *
- * @version 1.0.0 10th March 2018
+ * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
 public class Relationship {
@@ -16,19 +16,28 @@ public class Relationship {
         this.user = user;
     }
 
+    /**
+     * Getter for relation type
+     * @return
+     */
     public RelationType getRelation() {
         return relation;
     }
 
+    /**
+     * Setter for relation type
+     * @param relation
+     */
     public void setRelation(RelationType relation) {
         this.relation = relation;
     }
 
+    /**
+     * Getter for user
+     * @return
+     */
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 }
