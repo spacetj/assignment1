@@ -113,6 +113,7 @@ public class YoungAdult extends User {
     public void eraseRelationWithUser(User user) {
         Optional<Relationship> userRelo = relationships.stream().filter(o -> o.getUser().equals(user)).findFirst();
         if (userRelo.isPresent()) {
+            // If the to be deleted user is this users guardian, have to delete this user as well.
             if (isGuardian.test(userRelo.get())) {
                 System.out.println("\n\n Deleting "+this.getName()+" as "+user.getName()+" is one of its guardians");
                 relationships.forEach(o -> {

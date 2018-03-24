@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
  * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
-public class AddUserMenu extends MenuTemplate implements Menu {
+public class AddUserMenu implements Menu {
 
     public AddUserMenu() {}
 
@@ -101,6 +101,7 @@ public class AddUserMenu extends MenuTemplate implements Menu {
             }
 
             do {
+                //Check if the parent 1 already has a coparent assciated with them.
                 if (guardianOne.isPresent() && guardianOne.get().getFriends().stream()
                         .anyMatch(o -> o.getRelation() == RelationType.COPARENT)) {
                     guardianTwo = checkForCoParent(guardianOne.get());
@@ -140,7 +141,7 @@ public class AddUserMenu extends MenuTemplate implements Menu {
                 .getFriends().stream()
                 .filter(o -> o.getRelation() == RelationType.COPARENT)
                 .findFirst().get().getUser());
-        System.out.println(guardianOne.getName()+ "'s partner is "+guardianTwo.get().getName());
+        System.out.println("\n\n"+guardianOne.getName()+ "'s partner is "+guardianTwo.get().getName());
         System.out.println(guardianTwo.get().getName()+" is automatically selected as second guardian.");
         return guardianTwo;
     }

@@ -57,9 +57,9 @@ public class MiniNet {
     public static void printHeader() {
         System.out.println("Welcome to MiniNet, the next generation social media. Command line interfaces is where its at.\n");
         System.out.println("Useful Shortcuts:");
-        System.out.println("1. To exit the application at any time: "+ MenuTemplate.EXIT);
-        System.out.println("2. To go back a screen: "+ MenuTemplate.BACK);
-        System.out.println("3. To view these help shortcuts: "+ MenuTemplate.HELP);
+        System.out.println("1. To exit the application at any time: "+ menu.EXIT);
+        System.out.println("2. To go back a screen: "+ menu.BACK);
+        System.out.println("3. To view these help shortcuts: "+ menu.HELP);
         System.out.println(DIVIDER);
         System.out.println();
     }

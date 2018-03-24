@@ -2,7 +2,6 @@ package com.AdvancedProgramming.Menus;
 
 import com.AdvancedProgramming.MiniNet;
 import com.AdvancedProgramming.States;
-import com.AdvancedProgramming.UserService;
 import com.AdvancedProgramming.Users.User;
 
 import java.util.Objects;
@@ -15,7 +14,7 @@ import java.util.Scanner;
  * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
-public class MainMenu extends MenuTemplate implements Menu {
+public class MainMenu implements Menu {
 
     public MainMenu() {}
 
@@ -56,7 +55,7 @@ public class MainMenu extends MenuTemplate implements Menu {
                     selectUser(input);
                     break;
                 default:
-                    super.doAction(actionInt);
+                    defaultAction(actionInt);
                     break;
             }
         } else {
@@ -134,6 +133,7 @@ public class MainMenu extends MenuTemplate implements Menu {
             }
         } while(!user1.isPresent());
 
+        //Check if the back / exit / help input is given.
         if(!user1.isPresent()){
             checkSpecialInput(userOne);
         }
@@ -147,7 +147,7 @@ public class MainMenu extends MenuTemplate implements Menu {
             }
         } while(!user2.isPresent());
 
-        if(!user1.isPresent()){
+        if(!user2.isPresent()){
             checkSpecialInput(userOne);
         } else {
             if (user1.get().getUserRelation(user2.get()).isPresent()) {

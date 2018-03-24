@@ -1,8 +1,5 @@
 package com.AdvancedProgramming.Users;
 
-import com.AdvancedProgramming.UserService;
-import com.AdvancedProgramming.UserStore;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +22,6 @@ public abstract class User{
     public static Predicate<Relationship> isDependant = relationship -> relationship.getRelation() == RelationType.DEPENDANT;
     public static Predicate<Relationship> isGuardian = relationship -> relationship.getRelation() == RelationType.GUARDIAN;
     public static Predicate<Relationship> isFriend = relationship -> relationship.getRelation() == RelationType.FRIEND;
-    protected UserStore userService = UserService.getInstance();
 
     public User(String name, Integer age, String profilePicture, String status) {
         this.name = name;

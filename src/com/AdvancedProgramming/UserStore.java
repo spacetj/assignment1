@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * UserStore allows changing the implementation of getting user data without affecting the MiniNet code.
  *
- * @version 1.0.0  March 2018
+ * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
 

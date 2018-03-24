@@ -30,11 +30,21 @@ public class Infant extends YoungAdult {
         }
     }
 
+    /**
+     * Enables user to delete a relation, overriden from User abstract class according to the
+     * specific subclass constraints.
+     * @param friend User to be deleted.
+     */
     @Override
     public void deleteRelation(User friend) {
         System.out.println("\n\nCannot delete guardian relation\n\n");
     }
 
+    /**
+     * When another user is being deleted from the social network, this method is called to ensure that
+     * all exisiting connections between this user and the to be deleted user are erased.
+     * @param user that is to be deleted.
+     */
     @Override
     public void eraseRelationWithUser(User user){
         Optional<Relationship> userRelo = relationships.stream().filter(o -> o.getUser().equals(user)).findFirst();

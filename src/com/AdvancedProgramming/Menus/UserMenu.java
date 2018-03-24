@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
  * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara
  */
-public class UserMenu extends MenuTemplate implements Menu {
+public class UserMenu implements Menu {
 
     public UserMenu() {}
 
@@ -97,7 +97,7 @@ public class UserMenu extends MenuTemplate implements Menu {
                     deleteUser();
                     break;
                 default:
-                    super.doAction(actionInt);
+                    defaultAction(actionInt);
                     break;
             }
         } else {
@@ -175,7 +175,7 @@ public class UserMenu extends MenuTemplate implements Menu {
 
             } while (!delFriend.isPresent());
 
-            if(delFriend.isPresent() && userService.getSelectedUser().get().getFriends().contains(delFriend.get())){
+            if(delFriend.isPresent() && userService.getSelectedUser().get().getUserRelation(delFriend.get()).isPresent()){
                 userService.getSelectedUser().get().deleteRelation(delFriend.get());
             } else {
                 checkSpecialInput(name);
@@ -220,7 +220,7 @@ public class UserMenu extends MenuTemplate implements Menu {
             o.getUser().eraseRelationWithUser(userService.getSelectedUser().get());
         });
 
-        // Delete the user's dependants
+        // Filter and delete user dependants.
         List<Relationship> dependants = userService.getSelectedUser().get().getFriends().stream()
                 .filter(o -> o.getRelation() == RelationType.DEPENDANT)
                 .collect(Collectors.toList());
