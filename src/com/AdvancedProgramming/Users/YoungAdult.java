@@ -1,6 +1,7 @@
 package com.AdvancedProgramming.Users;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -36,11 +37,17 @@ public class YoungAdult extends User {
     @Override
     public void addRelation(Relationship newFriend) {
 
-        if (isGuardian.test(newFriend) || (isAgeGapLessThan3(newFriend) &&
-                isYoungAdultFromDiffFamily(newFriend))) {
-            super.addRelation(newFriend);
-        } else {
-            System.out.println("\nCannot add friend.\n\n");
+        if (!relationships.contains(newFriend) && !newFriend.getUser().getName().equalsIgnoreCase(this.getName())) {
+            if (isGuardian.test(newFriend)) {
+                relationships.add(newFriend);
+                newFriend.getUser().addRelation(new Relationship(RelationType.DEPENDANT, this));
+            } else if (isAgeGapLessThan3(newFriend) && isYoungAdultFromDiffFamily(newFriend) && isFriend.test(newFriend)) {
+                relationships.add(newFriend);
+                System.out.println("\n\n"+newFriend.getUser().getName()+" added as a new friend to "+this.getName()+"\n\n");
+                newFriend.getUser().addRelation(new Relationship(RelationType.FRIEND, this));
+            } else {
+                System.out.println("\nCannot add friend.\n\n");
+            }
         }
     }
 
@@ -50,10 +57,14 @@ public class YoungAdult extends User {
      */
     @Override
     public void deleteRelation(User friend) {
-        if (this.getUserRelation(friend).isPresent() && !isGuardian.test(this.getUserRelation(friend).get())) {
-            super.deleteRelation(friend);
-        } else if (this.getUserRelation(friend).get().getRelation() == RelationType.GUARDIAN) {
-            System.out.println("Cannot delete a guardian / dependant relation");
+        if (this.getUserRelation(friend).isPresent()) {
+            if(isGuardian.test(this.getUserRelation(friend).get())){
+                System.out.println("\n\nCannot delete a guardian.\n\n");
+            } else {
+                relationships.remove(this.getUserRelation(friend).get());
+                friend.deleteRelation(this);
+                System.out.println(this.getName()+" delete "+friend.getName()+" as a friend.");
+            }
         }
     }
 
@@ -64,7 +75,7 @@ public class YoungAdult extends User {
      */
     private Boolean isAgeGapLessThan3(Relationship user) {
 
-        if (Math.abs(this.getAge() - user.getUser().getAge()) > 3 && user.getRelation() != RelationType.GUARDIAN) {
+        if (Math.abs(this.getAge() - user.getUser().getAge()) > 3 && !isGuardian.test(user)) {
             System.out.println("\n\nAge difference is great than 3.\n\n");
             return false;
         }
@@ -79,22 +90,39 @@ public class YoungAdult extends User {
      */
     private Boolean isYoungAdultFromDiffFamily(Relationship relation) {
 
-        if (!UserFactory.isYoungAdult.test(relation.getUser()) && relation.getRelation() != RelationType.GUARDIAN) {
+
+        if (!UserFactory.isYoungAdult.test(relation.getUser())) {
             System.out.println("\n\nOnly young adult can be friend with a young adult.\n");
             return false;
         }
 
         List<User> parents = relationships.stream()
-                .filter(o -> o.getRelation() == RelationType.GUARDIAN)
+                .filter(o -> isGuardian.test(o))
                 .map(Relationship::getUser).collect(Collectors.toList());
 
         // Check that the new friend doesn't have a relation to current users parents.
-        if (relation.getUser().getUserRelation(parents.get(0)).isPresent() ||
-                relation.getUser().getUserRelation(parents.get(1)).isPresent()) {
-            System.out.println("\n\nYoung adult needs to be from a different family.\n");
+        if(parents.stream().noneMatch(o -> o.getUserRelation(relation.getUser()).isPresent())){
+            return true;
+        } else {
+            System.out.println("Young adult is from the same family.");
             return false;
         }
+    }
 
-        return true;
+    @Override
+    public void eraseRelationWithUser(User user) {
+        Optional<Relationship> userRelo = relationships.stream().filter(o -> o.getUser().equals(user)).findFirst();
+        if (userRelo.isPresent()) {
+            if (isGuardian.test(userRelo.get())) {
+                System.out.println("\n\n Deleting "+this.getName()+" as "+user.getName()+" is one of its guardians");
+                relationships.forEach(o -> {
+                    if (!o.getUser().equals(user)) {
+                        o.getUser().eraseRelationWithUser(this);
+                    }
+                });
+            } else if(isFriend.test(userRelo.get())){
+                relationships.remove(userRelo.get());
+            }
+        }
     }
 }

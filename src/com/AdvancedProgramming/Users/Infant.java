@@ -1,5 +1,7 @@
 package com.AdvancedProgramming.Users;
 
+import java.util.Optional;
+
 /**
  * Infact class is instantiated when the user is below 2 years old.
  *
@@ -18,10 +20,33 @@ public class Infant extends YoungAdult {
      */
     @Override
     public void addRelation(Relationship newFriend) {
-        if(isGuardian.test(newFriend)){
-            super.addRelation(newFriend);
-        } else {
-            System.out.println("Infants cannot have friends");
+        if (!relationships.contains(newFriend) && !newFriend.getUser().getName().equalsIgnoreCase(this.getName())) {
+            if(isGuardian.test(newFriend)){
+                relationships.add(newFriend);
+                newFriend.getUser().addRelation(new Relationship(RelationType.DEPENDANT, this));
+            } else {
+                System.out.println("\n\nInfants cannot have friends\n\n");
+            }
         }
     }
+
+    @Override
+    public void deleteRelation(User friend) {
+        System.out.println("\n\nCannot delete guardian relation\n\n");
+    }
+
+    @Override
+    public void eraseRelationWithUser(User user){
+        Optional<Relationship> userRelo = relationships.stream().filter(o -> o.getUser().equals(user)).findFirst();
+        if(userRelo.isPresent() && isGuardian.test(userRelo.get())){
+            System.out.println("\n\n Deleting "+this.getName()+" as "+user.getName()+" is one of its guardians");
+            relationships.forEach(o -> {
+                if (!o.getUser().equals(user)) {
+                    o.getUser().eraseRelationWithUser(this);
+                }
+            });
+        }
+    }
+
+
 }

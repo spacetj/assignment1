@@ -12,9 +12,13 @@ public class UserFactory{
 
     public static Integer INFANT_AGE = 2;
     public static Integer YOUNG_ADULT = 16;
-    public static Predicate<User> isYoungAdult = user -> user.getAge() < YOUNG_ADULT;
+    public static Predicate<User> isYoungAdult = user -> user.getAge() < YOUNG_ADULT && user.getAge() > INFANT_AGE;
     public static Predicate<User> isAdult = user -> user.getAge() >= YOUNG_ADULT;
     public static Predicate<User> isInfant = user -> user.getAge() <= INFANT_AGE;
+
+    public static User getUser(String name, Integer age, String profilePicture, String status){
+        return getUser(name,age,profilePicture,status,null,null);
+    }
 
     /**
      * UserFactory default create user method which takes in the information required and results in the

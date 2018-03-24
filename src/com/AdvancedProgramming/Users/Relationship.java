@@ -1,5 +1,7 @@
 package com.AdvancedProgramming.Users;
 
+import javax.management.relation.Relation;
+
 /**
  * Relationship is the class used to add a friend to a user.
  *
@@ -40,4 +42,11 @@ public class Relationship {
         return user;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Relationship rel = (Relationship) obj;
+        return obj instanceof Relationship
+                && rel.getUser() == this.getUser()
+                && rel.getRelation() == this.getRelation();
+    }
 }

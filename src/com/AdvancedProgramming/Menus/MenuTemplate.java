@@ -11,7 +11,7 @@ import java.util.List;
 import static com.AdvancedProgramming.MiniNet.isInputInt;
 
 /**
- * MenuTemplate has methods that apply to all menu.
+ * MenuTemplate has shared methods that apply to all menu.
  *
  * @version 1.0.0 22nd March 2018
  * @author Tejas Cherukara

@@ -2,6 +2,7 @@ package com.AdvancedProgramming.Menus;
 
 import com.AdvancedProgramming.MiniNet;
 import com.AdvancedProgramming.States;
+import com.AdvancedProgramming.Users.RelationType;
 import com.AdvancedProgramming.Users.User;
 import com.AdvancedProgramming.Users.UserFactory;
 
@@ -40,9 +41,10 @@ public class AddUserMenu extends MenuTemplate implements Menu {
 
         String name;
         do{
-            System.out.print("Enter name: ");
+            System.out.print("Enter name (must be unique): ");
             name = input.nextLine();
-        } while (Objects.equals(name, "") || Objects.equals(name, " "));
+            checkSpecialInput(name);
+        } while (Objects.equals(name, "") || Objects.equals(name, " ") || !userService.uniqueName(name));
 
         String age;
         do{
@@ -60,7 +62,7 @@ public class AddUserMenu extends MenuTemplate implements Menu {
         String status = input.nextLine();
 
         if (ageInt >= UserFactory.YOUNG_ADULT) {
-            userService.addUser(UserFactory.getUser(name,ageInt,profilePicture,status, null, null));
+            userService.addUser(UserFactory.getUser(name,ageInt,profilePicture,status));
         } else {
             getYoungAdult(input, name, ageInt, profilePicture, status);
         }
@@ -78,9 +80,9 @@ public class AddUserMenu extends MenuTemplate implements Menu {
     private void getYoungAdult(Scanner input, String name, Integer ageInt, String profilePicture, String status) {
         // If age is less than 16, they need to choose 2 parents.
         List<User> adults = userService.getUsers().stream().filter(UserFactory.isAdult).collect(Collectors.toList());
-        if(adults.size() >= 2){
+        if (adults.size() >= 2) {
             IntStream.range(0, adults.size())
-                    .mapToObj(i -> (i+1)+". "+userService.getUsers().get(i).getName()).forEach(System.out::println);
+                    .mapToObj(i -> (i + 1) + ". " + userService.getUsers().get(i).getName()).forEach(System.out::println);
 
             Optional<User> guardianOne, guardianTwo;
             String guardianOneName, guardianTwoName;
@@ -89,34 +91,58 @@ public class AddUserMenu extends MenuTemplate implements Menu {
                 System.out.print("Enter name of guardian 1: ");
                 guardianOneName = input.nextLine();
                 guardianOne = userService.getUserWithName(guardianOneName);
-                if(isSpecialInput(guardianOneName)){
+                if (isSpecialInput(guardianOneName)) {
                     break;
                 }
             } while (!guardianOne.isPresent());
 
-            if(!guardianOne.isPresent()){
+            if (!guardianOne.isPresent()) {
                 checkSpecialInput(guardianOneName);
             }
 
             do {
-                System.out.print("Enter name of guardian 2 (Cannot be same user as guardian 1): ");
-                guardianTwoName = input.nextLine();
-                guardianTwo = userService.getUserWithName(guardianTwoName);
-                if(isSpecialInput(guardianTwoName)){
-                    break;
+                if (guardianOne.isPresent() && guardianOne.get().getFriends().stream()
+                        .anyMatch(o -> o.getRelation() == RelationType.COPARENT)) {
+                    guardianTwo = checkForCoParent(guardianOne.get());
+                    guardianTwoName = guardianTwo.get().getName();
+
+                } else {
+                    System.out.print("Enter name of guardian 2 (Cannot be same user as guardian 1): ");
+                    guardianTwoName = input.nextLine();
+                    guardianTwo = userService.getUserWithName(guardianTwoName);
+                    if (isSpecialInput(guardianTwoName)) {
+                        break;
+                    }
                 }
             } while (!guardianTwo.isPresent() || guardianTwo.get() == guardianOne.get());
 
-            if(guardianTwo.isPresent()){
+            if (guardianTwo.isPresent()) {
                 userService.addUser(
-                        UserFactory.getUser(name,ageInt,profilePicture,status, guardianOne.get(), guardianTwo.get())
+                        UserFactory.getUser(name, ageInt, profilePicture, status, guardianOne.get(), guardianTwo.get())
                 );
             } else {
+                System.out.println("\n\n Error creating user.\n\n");
                 checkSpecialInput(guardianTwoName);
             }
         } else {
             System.out.println("\nNeed at least 2 adults to add a young adult.\n");
         }
+    }
+
+    /**
+     * Check if a person already has a coparent relationship.
+     * @param guardianOne user to check the coparent relationship for.
+     * @return Optional user to see if a coparent exists.
+     */
+    private Optional<User> checkForCoParent(User guardianOne) {
+        Optional<User> guardianTwo;
+        guardianTwo = Optional.ofNullable(guardianOne
+                .getFriends().stream()
+                .filter(o -> o.getRelation() == RelationType.COPARENT)
+                .findFirst().get().getUser());
+        System.out.println(guardianOne.getName()+ "'s partner is "+guardianTwo.get().getName());
+        System.out.println(guardianTwo.get().getName()+" is automatically selected as second guardian.");
+        return guardianTwo;
     }
 
 }

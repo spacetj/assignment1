@@ -1,8 +1,10 @@
 package com.AdvancedProgramming.Users;
 
+import com.AdvancedProgramming.UserService;
+import com.AdvancedProgramming.UserStore;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -22,6 +24,8 @@ public abstract class User{
     private String status;
     public static Predicate<Relationship> isDependant = relationship -> relationship.getRelation() == RelationType.DEPENDANT;
     public static Predicate<Relationship> isGuardian = relationship -> relationship.getRelation() == RelationType.GUARDIAN;
+    public static Predicate<Relationship> isFriend = relationship -> relationship.getRelation() == RelationType.FRIEND;
+    protected UserStore userService = UserService.getInstance();
 
     public User(String name, Integer age, String profilePicture, String status) {
         this.name = name;
@@ -40,52 +44,14 @@ public abstract class User{
     }
 
     /**
-     * Add a new relation to this user. Will have different specification according to relationtype.
+     * Abstract add new relation method which will be overriden in below classes.
      * @param newFriend friend to add to user.
      */
-    public void addRelation(Relationship newFriend) {
+    public abstract void addRelation(Relationship newFriend);
 
-        // If new user is guardian, the reciprocal relation should be dependant.
-        if (isDependant.test(newFriend) || isGuardian.test(newFriend)) {
+    public abstract void deleteRelation(User friend);
 
-            relationships.add(newFriend);
-
-            if(isGuardian.test(newFriend)){
-                newFriend.getUser().addRelation(new Relationship(RelationType.DEPENDANT, this));
-            }
-
-        } else if (!relationships.contains(newFriend)) {
-
-            Optional<Relationship> existingRelation = getUserRelation(newFriend.getUser());
-
-            if (existingRelation.isPresent()) {
-                existingRelation.get().setRelation(newFriend.getRelation());
-                newFriend.getUser().getUserRelation(this).ifPresent(relationship1 ->
-                        relationship1.setRelation(newFriend.getRelation()));
-            } else {
-                relationships.add(newFriend);
-                newFriend.getUser().addRelation(new Relationship(newFriend.getRelation(), this));
-            }
-
-        }
-    }
-
-    /**
-     * Deletes the relation for both users.
-     * @param friend to delete
-     */
-    public void deleteRelation(User friend) {
-
-        Optional<Relationship> relation = relationships.stream()
-                .filter(o -> Objects.equals(o.getUser().getName(), friend.getName())).findAny();
-
-        if(relation.isPresent()){
-            relationships.remove(relation.get());
-            friend.deleteRelation(this);
-        } else {
-            System.out.println("No such relation exists.");
-        }
-    }
+    public abstract void eraseRelationWithUser(User user);
 
     /**
      * Displays information about the friends / relations of a user.

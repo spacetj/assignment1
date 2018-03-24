@@ -75,7 +75,7 @@ public class UserService implements UserStore {
      */
     public void addUser(User u) {
         users.add(u);
-        System.out.println("Successfully added user: " + u.getName());
+        System.out.println("\n\nSuccessfully added user: " + u.getName()+"\n\n");
     }
 
     /**
@@ -119,5 +119,14 @@ public class UserService implements UserStore {
      */
     public Optional<User> getUserWithName(String name) {
         return users.stream().filter(o -> o.getName().equalsIgnoreCase(name)).findAny();
+    }
+
+    /**
+     * Check that a users name is unique and hasnt been taken.
+     * @param name
+     * @return
+     */
+    public boolean uniqueName(String name){
+        return users.stream().noneMatch(o -> o.getName().equalsIgnoreCase(name));
     }
 }

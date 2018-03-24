@@ -38,7 +38,7 @@ public class MainMenu extends MenuTemplate implements Menu {
      */
     @Override
     public void doAction(Scanner input) {
-        System.out.print("Select from menu: ");
+        System.out.print("Select number from menu: ");
         String action = input.nextLine();
         if(MiniNet.isInputInt(action)){
             int actionInt = Integer.parseInt(action);

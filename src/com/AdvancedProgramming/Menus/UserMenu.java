@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * UserMenu has the menu options once a user is selected.
@@ -53,7 +54,7 @@ public class UserMenu extends MenuTemplate implements Menu {
             } else {
                 System.out.println("6. Show dependants");
             }
-            System.out.println("7. Delete person");
+            System.out.println("7. Delete account");
         } else {
             System.out.println("\nSelect a user first\n");
             MiniNet.switchState(States.MAIN_MENU);
@@ -66,7 +67,7 @@ public class UserMenu extends MenuTemplate implements Menu {
      */
     @Override
     public void doAction(Scanner input) {
-        System.out.print("Select from menu:");
+        System.out.print("Select number from menu:");
         String action = input.nextLine();
         if(MiniNet.isInputInt(action) && userService.getSelectedUser().isPresent()){
             int actionInt = Integer.parseInt(action);
@@ -174,9 +175,8 @@ public class UserMenu extends MenuTemplate implements Menu {
 
             } while (!delFriend.isPresent());
 
-            if(delFriend.isPresent()){
+            if(delFriend.isPresent() && userService.getSelectedUser().get().getFriends().contains(delFriend.get())){
                 userService.getSelectedUser().get().deleteRelation(delFriend.get());
-                delFriend.get().deleteRelation(userService.getSelectedUser().get());
             } else {
                 checkSpecialInput(name);
             }
@@ -214,15 +214,25 @@ public class UserMenu extends MenuTemplate implements Menu {
     /**
      * Delete user from the user store.
      */
-    private void deleteUser(){
+    private void deleteUser() {
         // Delete the relations that link to user
         userService.getSelectedUser().get().getFriends().forEach(o -> {
-            o.getUser().deleteRelation(userService.getSelectedUser().get());
+            o.getUser().eraseRelationWithUser(userService.getSelectedUser().get());
         });
-        // Delete the user
+
+        // Delete the user's dependants
+        List<Relationship> dependants = userService.getSelectedUser().get().getFriends().stream()
+                .filter(o -> o.getRelation() == RelationType.DEPENDANT)
+                .collect(Collectors.toList());
+
+        IntStream.range(0, dependants.size()).forEach(i -> {
+            userService.deleteUser(dependants.get(i).getUser());
+        });
+
         userService.deleteUser(userService.getSelectedUser().get());
-        userService.setSelectedUser(null);
+
         //Change state
         MiniNet.switchState(States.MAIN_MENU);
+        userService.setSelectedUser(null);
     }
 }
