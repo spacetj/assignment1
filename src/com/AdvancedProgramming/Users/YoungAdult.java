@@ -2,7 +2,6 @@ package com.AdvancedProgramming.Users;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -109,6 +108,11 @@ public class YoungAdult extends User {
         }
     }
 
+    /**
+     * When another user is being deleted from the social network, this method is called to ensure that
+     * all exisiting connections between this user and the to be deleted user are erased.
+     * @param user that is to be deleted.
+     */
     @Override
     public void eraseRelationWithUser(User user) {
         Optional<Relationship> userRelo = relationships.stream().filter(o -> o.getUser().equals(user)).findFirst();

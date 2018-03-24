@@ -16,6 +16,15 @@ public class UserFactory{
     public static Predicate<User> isAdult = user -> user.getAge() >= YOUNG_ADULT;
     public static Predicate<User> isInfant = user -> user.getAge() <= INFANT_AGE;
 
+    /**
+     * Overloaded method which can be called when instantiating adults as they dont need parents / guardians
+     * to be set.
+     * @param name name of the user to be created.
+     * @param age  age of the user to be created.
+     * @param profilePicture profilePicture of the user to be created.
+     * @param status status of the user to be created.
+     * @return
+     */
     public static User getUser(String name, Integer age, String profilePicture, String status){
         return getUser(name,age,profilePicture,status,null,null);
     }

@@ -1,7 +1,5 @@
 package com.AdvancedProgramming.Users;
 
-import javax.management.relation.Relation;
-
 /**
  * Relationship is the class used to add a friend to a user.
  *

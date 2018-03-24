@@ -81,8 +81,7 @@ public class AddUserMenu implements Menu {
         // If age is less than 16, they need to choose 2 parents.
         List<User> adults = userService.getUsers().stream().filter(UserFactory.isAdult).collect(Collectors.toList());
         if (adults.size() >= 2) {
-            IntStream.range(0, adults.size())
-                    .mapToObj(i -> (i + 1) + ". " + userService.getUsers().get(i).getName()).forEach(System.out::println);
+            IntStream.range(0, adults.size()).mapToObj(i -> (i + 1) + ". " + userService.getUsers().get(i).getName()).forEach(System.out::println);
 
             Optional<User> guardianOne, guardianTwo;
             String guardianOneName, guardianTwoName;
@@ -100,8 +99,7 @@ public class AddUserMenu implements Menu {
                 checkSpecialInput(guardianOneName);
             }
 
-            do {
-                //Check if the parent 1 already has a coparent assciated with them.
+            do {//Check if the parent 1 already has a coparent assciated with them.
                 if (guardianOne.isPresent() && guardianOne.get().getFriends().stream()
                         .anyMatch(o -> o.getRelation() == RelationType.COPARENT)) {
                     guardianTwo = checkForCoParent(guardianOne.get());
@@ -111,9 +109,7 @@ public class AddUserMenu implements Menu {
                     System.out.print("Enter name of guardian 2 (Cannot be same user as guardian 1): ");
                     guardianTwoName = input.nextLine();
                     guardianTwo = userService.getUserWithName(guardianTwoName);
-                    if (isSpecialInput(guardianTwoName)) {
-                        break;
-                    }
+                    if (isSpecialInput(guardianTwoName)) {break;}
                 }
             } while (!guardianTwo.isPresent() || guardianTwo.get() == guardianOne.get());
 

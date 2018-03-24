@@ -163,6 +163,7 @@ public class UserMenu implements Menu {
         Optional<User> delFriend;
         String name;
 
+        // Check that the user has friends before the delete functionality
         if (!userService.getSelectedUser().get().getFriends().isEmpty()) {
             do {
                 System.out.println("\n\n Name of the user to delete: ");

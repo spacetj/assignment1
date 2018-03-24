@@ -40,13 +40,21 @@ public abstract class User{
     }
 
     /**
-     * Abstract add new relation method which will be overriden in below classes.
+     * Abstract add new relation method which will be overriden in sub classes.
      * @param newFriend friend to add to user.
      */
     public abstract void addRelation(Relationship newFriend);
 
+    /**
+     * Abstract delete relation method which will be overriden in sub classes.
+     * @param friend friend to add to user.
+     */
     public abstract void deleteRelation(User friend);
 
+    /**
+     * Abstract erase relation with user method which will be overriden in sub classes.
+     * @param user friend to add to user.
+     */
     public abstract void eraseRelationWithUser(User user);
 
     /**
